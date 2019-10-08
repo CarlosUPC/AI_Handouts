@@ -6,13 +6,17 @@ public class SteeringSeparation : MonoBehaviour {
 	public LayerMask mask;
 	public float search_radius = 5.0f;
 	public AnimationCurve strength;
-
-	Move move;
+    private Vector3 prev_pos;
+    public float avoidance = 3.0f;
+    SteeringSeek seek;
+    Move move;
 
 	// Use this for initialization
 	void Start () {
 		move = GetComponent<Move>();
-	}
+        prev_pos = transform.position;
+        seek = GetComponent<SteeringSeek>();
+    }
 	
 	// Update is called once per frame
 	void Update () 
@@ -24,14 +28,14 @@ public class SteeringSeparation : MonoBehaviour {
 
         Collider[] colliders = Physics.OverlapSphere(transform.position, search_radius, mask);
         Vector3 final = Vector3.zero;
-
         foreach (Collider col in colliders)
         {
             GameObject go = col.gameObject;
 
             if (go == gameObject)
                 continue;
-
+           
+           // prev_pos = transform.position;
             Vector3 diff = transform.position - go.transform.position;
             diff.y = 0.0f;
             float distance = diff.magnitude;
@@ -45,8 +49,13 @@ public class SteeringSeparation : MonoBehaviour {
         {
             if (final_strength > move.max_mov_acceleration)
                 final = final.normalized * move.max_mov_acceleration;
-            move.AccelerateMovement(final);
+
+            //Vector3 avoid_pos =  this.transform.position += (final * avoidance);
+            //seek.Steer(avoid_pos);
+           move.AccelerateMovement(final);
         }
+     
+        
     }
 
 	void OnDrawGizmosSelected() 
